@@ -6,7 +6,9 @@ const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: {
+    origin: "*"
+  }
 });
 
 app.use(express.static(__dirname));
@@ -15,11 +17,12 @@ const players = {};
 
 function createPlayer(id) {
   return {
-    id,
+    id: id,
     x: 350 + Math.random() * 100,
-    y: 250 + Math.random() * 100,
+    y: 200 + Math.random() * 100,
     color: "#" + Math.floor(Math.random() * 16777215)
-      .toString(16).padStart(6, "0"),
+      .toString(16)
+      .padStart(6, "0"),
     name: "Player",
     health: 100
   };
@@ -28,13 +31,19 @@ function createPlayer(id) {
 io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
+  // Create the new player
   players[socket.id] = createPlayer(socket.id);
 
+  // Send existing players to the newly connected player
   socket.emit("currentPlayers", players);
+
+  // Notify other players
   socket.broadcast.emit("newPlayer", players[socket.id]);
 
+  // Handle movement
   socket.on("move", (data) => {
     const player = players[socket.id];
+
     if (!player || !data) return;
 
     const dx = Number(data.dx);
@@ -52,8 +61,11 @@ io.on("connection", (socket) => {
       y: player.y
     });
   });
+
+  // Handle shooting
   socket.on("shoot", () => {
     const player = players[socket.id];
+
     if (!player) return;
 
     io.emit("shotFired", {
@@ -63,13 +75,18 @@ io.on("connection", (socket) => {
       color: player.color
     });
   });
+
+  // Handle disconnection
   socket.on("disconnect", () => {
     delete players[socket.id];
+
     io.emit("playerDisconnected", socket.id);
+
     console.log("Player disconnected:", socket.id);
   });
 });
 
+// Health check
 app.get("/health", (req, res) => {
   res.json({
     status: "OK",
@@ -77,6 +94,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, "0.0.0.0", () => {
