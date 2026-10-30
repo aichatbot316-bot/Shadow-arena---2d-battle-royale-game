@@ -52,7 +52,17 @@ io.on("connection", (socket) => {
       y: player.y
     });
   });
+  socket.on("shoot", () => {
+    const player = players[socket.id];
+    if (!player) return;
 
+    io.emit("shotFired", {
+      id: socket.id,
+      x: player.x,
+      y: player.y,
+      color: player.color
+    });
+  });
   socket.on("disconnect", () => {
     delete players[socket.id];
     io.emit("playerDisconnected", socket.id);
