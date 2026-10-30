@@ -1,1 +1,217 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHADOW ARENA: BATTLE ROYALE</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #080b12;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+header { padding: 15px 8px; }
+h1 { color: #42e8f5; margin: 5px; font-size: 25px; }
+#status { color: #ffd166; margin: 8px; }
+#arena {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  margin: 10px auto;
+  background: #18252a;
+  border: 2px solid #42e8f5;
+  touch-action: none;
+}
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 15px auto;
+}
+button {
+  background: #172d3c;
+  border: 2px solid #42e8f5;
+  border-radius: 12px;
+  color: white;
+  font-size: 23px;
+  width: 65px;
+  height: 55px;
+  touch-action: none;
+}
+#help { color: #bdc7d3; padding: 0 12px 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SHADOW ARENA</h1>
+  <div>BATTLE ROYALE — MULTIPLAYER TEST</div>
+  <div id="status">Connecting to server...</div>
+  <div id="count">Players: 0</div>
+</header><canvas id="arena" width="800" height="500"></canvas>
 
+<div class="controls">
+  <button id="left">◀</button>
+  <button id="up">▲</button>
+  <button id="down">▼</button>
+  <button id="right">▶</button>
+</div><p id="help">Use the arrows to move. Open the game on two devices to test multiplayer after deployment.</p><script src="/socket.io/socket.io.js"></script><script>
+const canvas = document.getElementById("arena");
+const ctx = canvas.getContext("2d");
+const statusText = document.getElementById("status");
+const countText = document.getElementById("count");
+
+let socket = null;
+let players = {};
+let myId = null;
+let connected = false;
+
+function drawArena() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#18252a";
+  ctx.fillRect(0, 0, 800, 500);
+
+  ctx.strokeStyle = "#263d40";
+  ctx.lineWidth = 1;
+
+  for (let x = 0; x <= 800; x += 40) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 500);
+    ctx.stroke();
+  }
+
+  for (let y = 0; y <= 500; y += 40) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(800, y);
+    ctx.stroke();
+  }
+
+  for (const id in players) {
+    const p = players[id];
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+    ctx.fillStyle = p.color || "#42e8f5";
+    ctx.fill();
+
+    ctx.strokeStyle = id === myId ? "#ffffff" : "#111111";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "13px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(id === myId ? "YOU" : "PLAYER", p.x, p.y - 22);
+  }
+
+  countText.textContent = "Players: " + Object.keys(players).length;
+  requestAnimationFrame(drawArena);
+}
+
+function connect() {
+  if (typeof io !== "function") {
+    statusText.textContent = "Server not deployed yet";
+    return;
+  }
+
+  socket = io();
+
+  socket.on("connect", () => {
+    connected = true;
+    myId = socket.id;
+    statusText.textContent = "Connected! Waiting for players...";
+  });
+
+  socket.on("connect_error", () => {
+    statusText.textContent = "Connection failed — check server deployment";
+  });
+
+  socket.on("disconnect", () => {
+    connected = false;
+    statusText.textContent = "Disconnected from server";
+  });
+
+  socket.on("currentPlayers", (data) => {
+    players = data || {};
+  });
+
+  socket.on("newPlayer", (player) => {
+    players[player.id] = player;
+  });
+
+  socket.on("playerMoved", (data) => {
+    if (players[data.id]) {
+      players[data.id].x = data.x;
+      players[data.id].y = data.y;
+    }
+  });
+
+  socket.on("playerDisconnected", (id) => {
+    delete players[id];
+  });
+}
+
+function move(dx, dy) {
+  if (connected && socket) {
+    socket.emit("move", { dx, dy });
+  }
+}
+
+function setupButton(id, dx, dy) {
+  const button = document.getElementById(id);
+  let timer = null;
+
+  function start(event) {
+    event.preventDefault();
+    if (timer) return;
+    move(dx, dy);
+    timer = setInterval(() => move(dx, dy), 100);
+  }
+
+  function stop(event) {
+    if (event) event.preventDefault();
+    if (timer) clearInterval(timer);
+    timer = null;
+  }
+
+  button.addEventListener("pointerdown", start);
+  button.addEventListener("pointerup", stop);
+  button.addEventListener("pointercancel", stop);
+  button.addEventListener("pointerleave", stop);
+}
+
+setupButton("left", -1, 0);
+setupButton("right", 1, 0);
+setupButton("up", 0, -1);
+setupButton("down", 0, 1);
+
+document.addEventListener("keydown", (event) => {
+  if (event.repeat) return;
+
+  const keys = {
+    ArrowLeft: [-1, 0],
+    ArrowRight: [1, 0],
+    ArrowUp: [0, -1],
+    ArrowDown: [0, 1],
+    a: [-1, 0],
+    d: [1, 0],
+    w: [0, -1],
+    s: [0, 1]
+  };
+
+  const direction = keys[event.key];
+  if (direction) {
+    event.preventDefault();
+    move(direction[0], direction[1]);
+  }
+});
+
+drawArena();
+connect();
+</script></body>
+</html>
