@@ -91,6 +91,7 @@ const joystick = document.getElementById("joystick");
 const stick = document.getElementById("stick");
 
 let socket, players = {}, myId = null, connected = false;
+  let bullets = [];
 let joyX = 0, joyY = 0, sprinting = false;
 
 function connect() {
@@ -100,7 +101,18 @@ function connect() {
   }
 
   socket = io();
+  socket = io();
 
+  socket.on("connect", () => {
+    myId = socket.id;
+    connected = true;
+    statusText.textContent = "Connected!";
+  });
+
+  socket.on("disconnect", () => {
+    connected = false;
+    statusText.textContent = "Disconnected";
+  });
   socket.on("connect", () => {
     connected = true;
     myId = socket.id;
@@ -115,7 +127,33 @@ function connect() {
     connected = false;
     statusText.textContent = "Disconnected";
   });
+  socket.on("players", data => {
+    players = data;
+    countText.textContent = Object.keys(players).length;
+  });
+    socket.on("playerJoined", data => {
+    players[data.id] = data;
+    countText.textContent = Object.keys(players).length;
+  });
+    socket.on("playerDisconnected", data => {
+    delete players[data.id];
 
+    countText.textContent = Object.keys(players).length;
+  });
+    socket.on("playerMoved", data => {
+    if (players[data.id]) {
+      players[data.id].x = data.x;
+      players[data.id].y = data.y;
+    }
+  });
+    socket.on("shotFired", data => {
+    bullets.push({
+      x: data.x,
+      y: data.y,
+      color: data.color || "#ffff00",
+      life: 30
+    });
+  });
   socket.on("currentPlayers", data => players = data || {});
   socket.on("newPlayer", p => players[p.id] = p);
 
@@ -125,7 +163,14 @@ function connect() {
       players[data.id].y = data.y;
     }
   });
-
+socket.on("shotFired", data => {
+  bullets.push({
+    x: data.x,
+    y: data.y,
+    color: data.color || "#ffff00",
+    life: 30
+  });
+});
   socket.on("playerDisconnected", id => delete players[id]);
 }
 
