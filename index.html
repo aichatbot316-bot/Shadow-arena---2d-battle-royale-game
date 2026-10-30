@@ -101,25 +101,14 @@ function connect() {
   }
 
   socket = io();
-  socket = io();
-
+  
   socket.on("connect", () => {
     myId = socket.id;
     connected = true;
     statusText.textContent = "Connected!";
   });
 
-  socket.on("disconnect", () => {
-    connected = false;
-    statusText.textContent = "Disconnected";
-  });
-  socket.on("connect", () => {
-    connected = true;
-    myId = socket.id;
-    statusText.textContent = "CONNECTED";
-  });
-
-  socket.on("connect_error", () => {
+    socket.on("connect_error", () => {
     statusText.textContent = "Connection failed";
   });
 
@@ -127,19 +116,20 @@ function connect() {
     connected = false;
     statusText.textContent = "Disconnected";
   });
-  socket.on("players", data => {
+  socket.on("currentPlayers", data => {
     players = data;
     countText.textContent = Object.keys(players).length;
   });
-    socket.on("playerJoined", data => {
-    players[data.id] = data;
-    countText.textContent = Object.keys(players).length;
-  });
-    socket.on("playerDisconnected", data => {
-    delete players[data.id];
+    socket.on("newPlayer", data => {
+  console.log("New player joined:", data);
+  players[data.id] = data;
+  countText.textContent = Object.keys(players).length;
+});
+    socket.on("playerDisconnected", id => {
+  delete players[id];
 
-    countText.textContent = Object.keys(players).length;
-  });
+  countText.textContent = Object.keys(players).length;
+});
     socket.on("playerMoved", data => {
     if (players[data.id]) {
       players[data.id].x = data.x;
@@ -227,7 +217,12 @@ runButton.addEventListener("pointerdown", e => {
 });
 
 document.getElementById("fire").addEventListener("click", () => {
-  statusText.textContent = "Shooting feature coming soon";
+  if (!connected || !socket) {
+    statusText.textContent = "Not connected";
+    return;
+  }
+
+  socket.emit("shoot");
 });
 document.getElementById("jump").addEventListener("click", () => {
   statusText.textContent = "Jump feature coming soon";
@@ -263,7 +258,20 @@ function draw() {
     ctx.textAlign = "center";
     ctx.fillText(id === myId ? "YOU" : "PLAYER", p.x, p.y - 22);
   }
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
 
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+
+    b.life--;
+
+    if (b.life <= 0) {
+      bullets.splice(i, 1);
+    }
+  }
   countText.textContent = "Players: " + Object.keys(players).length;
   requestAnimationFrame(draw);
 }
