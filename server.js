@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
     if (Math.abs(dx) > 1 || Math.abs(dy) > 1) return;
 
     player.x = Math.max(20, Math.min(780, player.x + dx * 5));
-    player.y = Math.max(20, Math.min(580, player.y + dy * 5));
+    player.y = Math.max(20, Math.min(480, player.y + dy * 5));
 
     io.emit("playerMoved", {
       id: socket.id,
