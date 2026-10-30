@@ -1,98 +1,189 @@
-<!DOCTYPE html><html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>SHADOW ARENA: BATTLE ROYALE</title>
-<style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #080b12;
-  color: white;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-  touch-action: none;
-}
-header { text-align: center; padding: 6px; }
-h1 { color: #42e8f5; margin: 2px; font-size: 23px; }
-#status { color: #ffd166; font-size: 13px; margin: 4px; }
-#count { font-size: 12px; }
-#arena {
-  display: block;
-  width: 100%;
-  max-width: 800px;
-  height: auto;
-  margin: 4px auto;
-  background: #18252a;
-  border: 2px solid #42e8f5;
-  touch-action: none;
-}
-#hud { position: fixed; inset: 0; pointer-events: none; }
-#joystick {
-  position: absolute; left: 22px; bottom: 25px;
-  width: 135px; height: 135px;
-  border: 3px solid #ffffff88; border-radius: 50%;
-  background: #aabccc22; pointer-events: auto;
-  touch-action: none;
-}
-#stick {
-  position: absolute; left: 38px; top: 38px;
-  width: 53px; height: 53px; border-radius: 50%;
-  background: #42e8f5bb; border: 2px solid white;
-}
-.action {
-  position: absolute; width: 62px; height: 62px;
-  border-radius: 50%; color: white; font-weight: bold;
-  font-size: 12px; background: #172d3cdd;
-  border: 2px solid #42e8f5;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: auto; touch-action: none;
-}
-#fire { right: 22px; bottom: 35px; width: 76px; height: 76px; background: #a62929dd; border-color: #ff7777; }
-#jump { right: 100px; bottom: 115px; }
-#sprint { right: 22px; bottom: 130px; }
-#crouch { right: 98px; bottom: 35px; }
-#hint { position: fixed; top: 88px; right: 8px; font-size: 10px; color: #ffffff99; }
-@media (orientation: landscape) {
-  header { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2; padding: 2px; }
-  h1 { font-size: 17px; }
-  #arena { width: 100vw; height: 100dvh; max-width: none; margin: 0; }
-  #status, #count { font-size: 10px; }
-  #joystick { width: 120px; height: 120px; left: 22px; bottom: 20px; }
-  #stick { left: 33px; top: 33px; }
-  #fire { right: 22px; bottom: 25px; }
-  #jump { right: 100px; bottom: 110px; }
-  #sprint { right: 22px; bottom: 120px; }
-  #crouch { right: 100px; bottom: 25px; }
-}
-</style>
-</head>
-<body>
-<header>
-  <h1>SHADOW ARENA</h1>
-  <div>BATTLE ROYALE</div>
-  <div id="status">Connecting to server...</div>
-  <div id="count">Players: 0</div>
-</header><canvas id="arena" width="800" height="500"></canvas>
 
-<div id="hud">
-  <div id="joystick"><div id="stick"></div></div>
-  <button class="action" id="fire">FIRE</button>
-  <button class="action" id="jump">JUMP</button>
-  <button class="action" id="sprint">RUN</button>
-  <button class="action" id="crouch">CROUCH</button>
-</div>
-<div id="hint">2D MULTIPLAYER TEST</div><script src="/socket.io/socket.io.js"></script><script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHADOW ARENA</title>
+
+<script src="https://shadow-arena-2d-battle-royale-game.onrender.com/socket.io/socket.io.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #071014;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 18px 10px;
+      background: #101f27;
+      border-bottom: 2px solid #19d9e8;
+    }
+
+    h1 {
+      margin: 0;
+      color: #42e8f5;
+      letter-spacing: 4px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #91aeb5;
+      margin-top: 7px;
+      font-size: 12px;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px;
+      color: #42e8f5;
+    }
+
+    #arena {
+      display: block;
+      width: 95%;
+      max-width: 800px;
+      height: auto;
+      aspect-ratio: 8 / 5;
+      margin: 5px auto;
+      background: #18252a;
+      border: 2px solid #42e8f5;
+      border-radius: 8px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 35px;
+      margin: 25px auto;
+      padding: 10px;
+    }
+
+    #joystick {
+      width: 125px;
+      height: 125px;
+      background: #183039;
+      border: 3px solid #42e8f5;
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+    }
+
+    #stick {
+      width: 48px;
+      height: 48px;
+      background: #42e8f5;
+      border-radius: 50%;
+      position: absolute;
+      left: 35px;
+      top: 35px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 15px 25px;
+      font-weight: bold;
+      font-size: 15px;
+      color: white;
+      background: #176b79;
+      touch-action: manipulation;
+    }
+
+    #sprint {
+      background: #a66a13;
+    }
+
+    #fire {
+      background: #c52b39;
+      padding: 19px 30px;
+    }
+
+    button:active {
+      transform: scale(0.94);
+      filter: brightness(1.3);
+    }
+
+    footer {
+      color: #78939a;
+      font-size: 12px;
+      padding: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>SHADOW ARENA</h1>
+    <div class="subtitle">MULTIPLAYER BATTLE ARENA</div>
+  </header>
+
+  <div class="info">
+    <span id="status">Connecting...</span>
+    <span id="count">Players: 0</span>
+  </div>
+
+  <canvas id="arena" width="800" height="500"></canvas>
+
+  <div class="controls">
+
+    <div id="joystick">
+      <div id="stick"></div>
+    </div>
+
+    <div class="buttons">
+      <button id="sprint">SPRINT</button>
+      <button id="fire">FIRE</button>
+    </div>
+
+  </div>
+
+  <footer>
+    SHADOW ARENA | GAME VERSION 1.0
+  </footer>
+
+<script>
 const canvas = document.getElementById("arena");
 const ctx = canvas.getContext("2d");
+
 const statusText = document.getElementById("status");
 const countText = document.getElementById("count");
+
 const joystick = document.getElementById("joystick");
 const stick = document.getElementById("stick");
 
-let socket, players = {}, myId = null, connected = false;
-  let bullets = [];
-let joyX = 0, joyY = 0, sprinting = false;
+const sprintButton = document.getElementById("sprint");
+const fireButton = document.getElementById("fire");
+
+let socket;
+let players = {};
+let myId = null;
+let connected = false;
+
+let joyX = 0;
+let joyY = 0;
+let sprinting = false;
+
+let bullets = [];
 
 function connect() {
   if (typeof io !== "function") {
@@ -100,15 +191,19 @@ function connect() {
     return;
   }
 
-  socket = io();
-  
+  // Same-origin server connection.
+  // If frontend and backend are hosted separately,
+  // put your backend URL inside io("YOUR_SERVER_URL").
+
+  socket = io("https://shadow-arena-2d-battle-royale-game.onrender.com");
+
   socket.on("connect", () => {
     myId = socket.id;
     connected = true;
     statusText.textContent = "Connected!";
   });
 
-    socket.on("connect_error", () => {
+  socket.on("connect_error", () => {
     statusText.textContent = "Connection failed";
   });
 
@@ -116,36 +211,28 @@ function connect() {
     connected = false;
     statusText.textContent = "Disconnected";
   });
-  socket.on("currentPlayers", data => {
-    players = data;
-    countText.textContent = Object.keys(players).length;
-  });
-    socket.on("newPlayer", data => {
-  console.log("New player joined:", data);
-  players[data.id] = data;
-  countText.textContent = Object.keys(players).length;
-});
-    socket.on("playerDisconnected", id => {
-  delete players[id];
 
-  countText.textContent = Object.keys(players).length;
-});
-    socket.on("playerMoved", data => {
-    if (players[data.id]) {
-      players[data.id].x = data.x;
-      players[data.id].y = data.y;
-    }
+  socket.on("currentPlayers", data => {
+    players = data || {};
+    countText.textContent =
+      "Players: " + Object.keys(players).length;
   });
-    socket.on("shotFired", data => {
-    bullets.push({
-      x: data.x,
-      y: data.y,
-      color: data.color || "#ffff00",
-      life: 30
-    });
+
+  socket.on("newPlayer", data => {
+    if (!data || !data.id) return;
+
+    players[data.id] = data;
+
+    countText.textContent =
+      "Players: " + Object.keys(players).length;
   });
-  socket.on("currentPlayers", data => players = data || {});
-  socket.on("newPlayer", p => players[p.id] = p);
+
+  socket.on("playerDisconnected", id => {
+    delete players[id];
+
+    countText.textContent =
+      "Players: " + Object.keys(players).length;
+  });
 
   socket.on("playerMoved", data => {
     if (players[data.id]) {
@@ -153,70 +240,146 @@ function connect() {
       players[data.id].y = data.y;
     }
   });
-socket.on("shotFired", data => {
-  bullets.push({
-    x: data.x,
-    y: data.y,
-    color: data.color || "#ffff00",
-    life: 30
+
+  socket.on("shotFired", data => {
+    bullets.push({
+      x: data.x,
+      y: data.y,
+      color: data.color || "#ffff00",
+      life: 30
+    });
   });
-});
-  socket.on("playerDisconnected", id => delete players[id]);
 }
+
+
+// JOYSTICK CONTROLS
+
+let joystickActive = false;
+
+function moveJoystick(event) {
+  if (!joystickActive) return;
+
+  const rect = joystick.getBoundingClientRect();
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  let dx = event.clientX - centerX;
+  let dy = event.clientY - centerY;
+
+  const maxDistance = 38;
+  const distance = Math.hypot(dx, dy);
+
+  if (distance > maxDistance) {
+    dx = dx / distance * maxDistance;
+    dy = dy / distance * maxDistance;
+  }
+
+  joyX = dx / maxDistance;
+  joyY = dy / maxDistance;
+
+  stick.style.left = (35 + dx) + "px";
+  stick.style.top = (35 + dy) + "px";
+}
+
+function resetJoystick() {
+  joystickActive = false;
+
+  joyX = 0;
+  joyY = 0;
+
+  stick.style.left = "35px";
+  stick.style.top = "35px";
+}
+
+joystick.addEventListener("pointerdown", event => {
+  joystickActive = true;
+  joystick.setPointerCapture(event.pointerId);
+  moveJoystick(event);
+});
+
+joystick.addEventListener("pointermove", moveJoystick);
+
+joystick.addEventListener("pointerup", resetJoystick);
+joystick.addEventListener("pointercancel", resetJoystick);
+
+
+// SPRINT CONTROL
+
+sprintButton.addEventListener("pointerdown", () => {
+  sprinting = true;
+});
+
+sprintButton.addEventListener("pointerup", () => {
+  sprinting = false;
+});
+
+sprintButton.addEventListener("pointercancel", () => {
+  sprinting = false;
+});
+
+sprintButton.addEventListener("pointerleave", () => {
+  sprinting = false;
+});
+
+
+// KEYBOARD CONTROLS
+
+const keys = {};
+
+document.addEventListener("keydown", event => {
+  keys[event.key.toLowerCase()] = true;
+
+  if (event.key === "Shift") {
+    sprinting = true;
+  }
+});
+
+document.addEventListener("keyup", event => {
+  keys[event.key.toLowerCase()] = false;
+
+  if (event.key === "Shift") {
+    sprinting = false;
+  }
+});
+
+
+// MOVEMENT
 
 function sendMove() {
   if (!connected || !socket) return;
-  let length = Math.hypot(joyX, joyY);
+
+  let x = joyX;
+  let y = joyY;
+
+  if (keys["arrowleft"] || keys["a"]) x -= 1;
+  if (keys["arrowright"] || keys["d"]) x += 1;
+  if (keys["arrowup"] || keys["w"]) y -= 1;
+  if (keys["arrowdown"] || keys["s"]) y += 1;
+
+  const length = Math.hypot(x, y);
+
   if (length < 0.15) return;
-  let speed = sprinting ? 1 : 0.7;
-  socket.emit("move", { dx: joyX * speed, dy: joyY * speed });
+
+  if (length > 1) {
+    x /= length;
+    y /= length;
+  }
+
+  const speed = sprinting ? 1 : 0.7;
+
+  socket.emit("move", {
+    dx: x * speed,
+    dy: y * speed
+  });
 }
 
-let activePointer = null;
+setInterval(sendMove, 50);
 
-joystick.addEventListener("pointerdown", e => {
-  e.preventDefault();
-  activePointer = e.pointerId;
-  joystick.setPointerCapture(e.pointerId);
-  updateStick(e);
-});
 
-joystick.addEventListener("pointermove", e => {
-  if (e.pointerId === activePointer) updateStick(e);
-});
+// SHOOTING
 
-function updateStick(e) {
-  const r = joystick.getBoundingClientRect();
-  let dx = e.clientX - (r.left + r.width / 2);
-  let dy = e.clientY - (r.top + r.height / 2);
-  const max = r.width * 0.32;
-  const len = Math.hypot(dx, dy);
-  if (len > max) { dx = dx / len * max; dy = dy / len * max; }
-  joyX = dx / max;
-  joyY = dy / max;
-  stick.style.transform = `translate(${dx}px, ${dy}px)`;
-}
-
-function stopStick(e) {
-  if (e.pointerId !== activePointer) return;
-  activePointer = null;
-  joyX = joyY = 0;
-  stick.style.transform = "translate(0,0)";
-}
-
-joystick.addEventListener("pointerup", stopStick);
-joystick.addEventListener("pointercancel", stopStick);
-setInterval(sendMove, 100);
-
-const runButton = document.getElementById("sprint");
-runButton.addEventListener("pointerdown", e => {
-  e.preventDefault(); sprinting = true;
-});
-["pointerup", "pointercancel", "pointerleave"].forEach(type => {
-  runButton.addEventListener(type, () => sprinting = false);
-});
-
-document.getElementById("fire").addEventListener("click", () => {
+fireButton.addEventListener("click", () => {
   if (!connected || !socket) {
     statusText.textContent = "Not connected";
     return;
@@ -224,45 +387,67 @@ document.getElementById("fire").addEventListener("click", () => {
 
   socket.emit("shoot");
 });
-document.getElementById("jump").addEventListener("click", () => {
-  statusText.textContent = "Jump feature coming soon";
-});
-document.getElementById("crouch").addEventListener("click", () => {
-  statusText.textContent = "Crouch feature coming soon";
-});
+
+
+// DRAW GAME
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   ctx.fillStyle = "#18252a";
   ctx.fillRect(0, 0, 800, 500);
+
   ctx.strokeStyle = "#263d40";
+  ctx.lineWidth = 1;
 
   for (let x = 0; x <= 800; x += 40) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 500); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 500);
+    ctx.stroke();
   }
+
   for (let y = 0; y <= 500; y += 40) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(800, y);
+    ctx.stroke();
   }
+
+  // DRAW PLAYERS
 
   for (const id in players) {
     const p = players[id];
+
     ctx.beginPath();
     ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+
     ctx.fillStyle = p.color || "#42e8f5";
     ctx.fill();
+
     ctx.lineWidth = 3;
     ctx.strokeStyle = id === myId ? "white" : "#111111";
     ctx.stroke();
+
     ctx.fillStyle = "white";
     ctx.font = "13px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(id === myId ? "YOU" : "PLAYER", p.x, p.y - 22);
+
+    ctx.fillText(
+      id === myId ? "YOU" : "PLAYER",
+      p.x,
+      p.y - 22
+    );
   }
+
+  // DRAW TEMPORARY SHOOTING EFFECTS
+
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
 
     ctx.beginPath();
     ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
+
     ctx.fillStyle = b.color;
     ctx.fill();
 
@@ -272,11 +457,20 @@ function draw() {
       bullets.splice(i, 1);
     }
   }
-  countText.textContent = "Players: " + Object.keys(players).length;
+
+  countText.textContent =
+    "Players: " + Object.keys(players).length;
+
   requestAnimationFrame(draw);
 }
 
+
+// START GAME
+
 connect();
 draw();
-</script></body>
+
+</script>
+
+</body>
 </html>
