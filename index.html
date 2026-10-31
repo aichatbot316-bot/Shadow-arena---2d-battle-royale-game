@@ -216,6 +216,48 @@
     gap: 9px;
   }
 }
+   
+.game-wrapper {
+  position: relative;
+  width: 95%;
+  max-width: 800px;
+  margin: 5px auto;
+}
+
+.game-wrapper #arena {
+  width: 100%;
+  display: block;
+  margin: 0;
+}
+
+.game-wrapper .controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.game-wrapper .controls #joystick,
+.game-wrapper .controls .buttons {
+  pointer-events: auto;
+}
+
+.game-wrapper .controls #joystick {
+  flex-shrink: 0;
+}
+
+.game-wrapper .controls .buttons {
+  flex-direction: row;
+  align-items: flex-end;
+}
     
   </style>
 </head>
@@ -232,6 +274,8 @@
     <span id="count">Players: 0</span>
   </div>
 
+  <div class="game-wrapper">
+
   <canvas id="arena" width="800" height="500"></canvas>
 
   <div class="controls">
@@ -245,6 +289,7 @@
       <button id="fire">FIRE</button>
     </div>
 
+  </div>
   </div>
 
   <footer>
