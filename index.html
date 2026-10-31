@@ -391,65 +391,130 @@ fireButton.addEventListener("click", () => {
 
 // DRAW GAME
 
+
 function draw() {
+  // PIXEL-ART BATTLEFIELD
+  ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#18252a";
+  // Grass background
+  ctx.fillStyle = "#477b36";
   ctx.fillRect(0, 0, 800, 500);
 
-  ctx.strokeStyle = "#263d40";
-  ctx.lineWidth = 1;
+  // Pixel grass details
+  for (let y = 0; y < 500; y += 16) {
+    for (let x = 0; x < 800; x += 16) {
+      const pattern = (x * 7 + y * 13) % 5;
 
-  for (let x = 0; x <= 800; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 500);
-    ctx.stroke();
+      if (pattern === 0) {
+        ctx.fillStyle = "#568c3e";
+        ctx.fillRect(x, y, 5, 5);
+      } else if (pattern === 1) {
+        ctx.fillStyle = "#38652f";
+        ctx.fillRect(x + 7, y + 5, 4, 4);
+      }
+    }
   }
 
-  for (let y = 0; y <= 500; y += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(800, y);
-    ctx.stroke();
+  // Battlefield road
+  ctx.fillStyle = "#77746b";
+  ctx.fillRect(0, 210, 800, 90);
+
+  ctx.fillStyle = "#928d7e";
+  ctx.fillRect(0, 214, 800, 4);
+  ctx.fillRect(0, 292, 800, 4);
+
+  // Road markings
+  ctx.fillStyle = "#e6dca7";
+  for (let x = 20; x < 800; x += 70) {
+    ctx.fillRect(x, 252, 35, 4);
   }
+
+  // Pixel buildings
+  function building(x, y, w, h) {
+    ctx.fillStyle = "#473d38";
+    ctx.fillRect(x, y, w, h);
+
+    ctx.fillStyle = "#9b8062";
+    ctx.fillRect(x + 5, y + 5, w - 10, h - 10);
+
+    ctx.fillStyle = "#594a3b";
+    ctx.fillRect(x + 12, y + 12, 15, 15);
+
+    ctx.fillStyle = "#343b43";
+    ctx.fillRect(x + w - 28, y + 12, 15, 15);
+
+    ctx.fillStyle = "#302c29";
+    ctx.fillRect(x + w / 2 - 10, y + h - 28, 20, 28);
+  }
+
+  building(70, 55, 110, 90);
+  building(590, 55, 130, 100);
+  building(330, 350, 120, 100);
+
+  // Pixel trees
+  function tree(x, y) {
+    ctx.fillStyle = "#65452d";
+    ctx.fillRect(x + 10, y + 17, 10, 20);
+
+    ctx.fillStyle = "#194c29";
+    ctx.fillRect(x, y + 5, 30, 20);
+
+    ctx.fillStyle = "#28723a";
+    ctx.fillRect(x + 5, y, 20, 25);
+
+    ctx.fillStyle = "#398b43";
+    ctx.fillRect(x + 8, y + 3, 7, 7);
+  }
+
+  tree(230, 75);
+  tree(510, 360);
+  tree(740, 340);
+  tree(250, 390);
 
   // DRAW PLAYERS
-
   for (const id in players) {
     const p = players[id];
 
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+    // Player shadow
+    ctx.fillStyle = "#263326";
+    ctx.fillRect(p.x - 10, p.y + 11, 22, 5);
 
+    // Player body
     ctx.fillStyle = p.color || "#42e8f5";
-    ctx.fill();
+    ctx.fillRect(p.x - 9, p.y - 10, 18, 23);
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = id === myId ? "white" : "#111111";
-    ctx.stroke();
+    // Player head
+    ctx.fillStyle = "#f0c69b";
+    ctx.fillRect(p.x - 6, p.y - 17, 12, 9);
 
+    // Helmet
+    ctx.fillStyle = "#263c54";
+    ctx.fillRect(p.x - 8, p.y - 19, 16, 6);
+
+    // Arms
+    ctx.fillStyle = "#d4d9df";
+    ctx.fillRect(p.x - 14, p.y - 7, 5, 13);
+    ctx.fillRect(p.x + 9, p.y - 7, 5, 13);
+
+    // Outline
+    ctx.strokeStyle = id === myId ? "#ffffff" : "#202020";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(p.x - 9, p.y - 10, 18, 23);
+
+    // Player name
     ctx.fillStyle = "white";
-    ctx.font = "13px Arial";
+    ctx.font = "bold 12px monospace";
     ctx.textAlign = "center";
-
-    ctx.fillText(
-      id === myId ? "YOU" : "PLAYER",
-      p.x,
-      p.y - 22
-    );
+    ctx.fillText(id === myId ? "YOU" : "PLAYER", p.x, p.y - 25);
   }
 
-  // DRAW TEMPORARY SHOOTING EFFECTS
-
+  // TEMPORARY SHOOTING EFFECTS
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
 
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
-
-    ctx.fillStyle = b.color;
-    ctx.fill();
+    ctx.fillStyle = b.color || "#ffff00";
+    ctx.fillRect(b.x - 3, b.y - 3, 7, 7);
 
     b.life--;
 
@@ -463,6 +528,7 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
+  
 
 
 // START GAME
