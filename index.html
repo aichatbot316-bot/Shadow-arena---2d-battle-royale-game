@@ -295,6 +295,49 @@
   height: 65px;
   font-size: 12px;
 }
+  
+/* BATTLE HUD */
+
+.battle-hud {
+  width: 95%;
+  max-width: 800px;
+  margin: 10px auto;
+  padding: 10px;
+  box-sizing: border-box;
+  background: rgba(15, 25, 30, 0.9);
+  border: 1px solid #607b83;
+  border-radius: 8px;
+}
+
+.health-label {
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.health-track {
+  height: 12px;
+  background: #402b2b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#healthFill {
+  width: 100%;
+  height: 100%;
+  background: #36d66b;
+  border-radius: 8px;
+}
+
+.weapon-label {
+  margin-top: 9px;
+  color: #f5d778;
+  font-size: 13px;
+  font-weight: bold;
+}
     
   </style>
 </head>
@@ -306,10 +349,27 @@
     <div class="subtitle">MULTIPLAYER BATTLE ARENA</div>
   </header>
 
-  <div class="info">
-    <span id="status">Connecting...</span>
-    <span id="count">Players: 0</span>
+  
+<div class="info">
+  <span id="status">Connecting...</span>
+  <span id="count">Players: 0</span>
+</div>
+
+<div class="battle-hud">
+  <div class="health-label">
+    <span>❤️ HEALTH</span>
+    <span id="healthValue">100 HP</span>
   </div>
+
+  <div class="health-track">
+    <div id="healthFill"></div>
+  </div>
+
+  <div class="weapon-label">
+    🔫 WEAPON: PISTOL
+  </div>
+</div>
+  
 
   <div class="game-wrapper">
 
