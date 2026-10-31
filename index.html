@@ -127,6 +127,96 @@
       font-size: 12px;
       padding: 15px;
     }
+    
+/* SHADOW ARENA MOBILE HUD */
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 18px auto;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+#joystick {
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  background: rgba(35, 45, 55, 0.85);
+  border: 3px solid #8babb5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  touch-action: none;
+  box-shadow: 0 0 12px #000;
+}
+
+#stick {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(#d8e6eb, #657b89);
+  border: 3px solid #263b48;
+  box-shadow: 0 3px 8px #000;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.buttons button {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 3px solid #d5e0e5;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  background: #263b52;
+  box-shadow: 0 4px 8px #000;
+}
+
+#fire {
+  width: 88px;
+  height: 88px;
+  background: #bd3028;
+  border-color: #ffb09c;
+  font-size: 16px;
+}
+
+#sprint {
+  background: #287b48;
+}
+
+.buttons button:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 600px) {
+  #arena {
+    width: 100%;
+    height: auto;
+  }
+
+  .controls {
+    padding: 8px;
+  }
+
+  #joystick {
+    width: 105px;
+    height: 105px;
+  }
+
+  .buttons {
+    gap: 9px;
+  }
+}
+    
   </style>
 </head>
 
